@@ -22,7 +22,7 @@ object PagesNearByRepository : IPagesNearByRepository {
         return Pair(resultData, continueString != null)
     }
 
-    override suspend fun getImagesCountForPage(pageTitle: String): Int {
+    private suspend fun getImagesCountForPage(pageTitle: String): Int {
         var count = 0
         var continueParam: ContinueData? = null
         do {

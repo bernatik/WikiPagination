@@ -6,6 +6,4 @@ interface IPagesNearByRepository {
 
     suspend fun getPagesNearBy(lat: Double, lon: Double): Pair<List<UiPage>, Boolean>
 
-    suspend fun getImagesCountForPage(pageTitle: String): Int
-
 }
