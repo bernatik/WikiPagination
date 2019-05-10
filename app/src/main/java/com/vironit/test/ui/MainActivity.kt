@@ -17,7 +17,6 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import com.vironit.test.R
-import com.vironit.test.data.api.ApiFactory
 import com.vironit.test.data.model.UiPage
 import com.vironit.test.ui.Location as UserLocation
 
@@ -25,16 +24,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     companion object {
         private const val LOCATION_PERMISSION_CODE = 777
-        private const val PAGE_START = 1
+        private const val FIRST_LOADING = 1
     }
 
-    private var currentPage = PAGE_START
+    private var loadingCounter = FIRST_LOADING
     private var isLastPage = false
-    private var totalPage = ApiFactory.PAGE_LIMIT_SIZE
     private var isLoading = false
-    var itemCount = 0
 
-    private lateinit var userLocation: UserLocation
+    private var userLocation: UserLocation? = null
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var mainViewModel: MainViewModel
@@ -63,16 +60,21 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        itemCount = 0
-        currentPage = PAGE_START
-        isLastPage = false
-        pagesAdapter.clear()
-        mainViewModel.loadPages(userLocation)
+        if (userLocation == null) {
+            getLastLocation()
+        } else {
+            loadingCounter = FIRST_LOADING
+            isLoading = true
+            isLastPage = false
+            pagesAdapter.clear()
+            mainViewModel.loadPages(userLocation)
+        }
     }
 
     private fun initSwipeContainer() {
         swapContainer = findViewById(R.id.swipe_container)
         swapContainer.setOnRefreshListener(this)
+        swapContainer.isRefreshing = true
     }
 
     private fun initPagesRecycler() {
@@ -85,7 +87,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         pagesRv.addOnScrollListener(object : PagesScrollListener(layoutManager) {
             override fun loadMoreItems() {
                 isLoading = true
-                currentPage++
+                loadingCounter++
                 mainViewModel.loadPages(userLocation)
             }
 
@@ -114,7 +116,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 showLoading()
             }
             is MainViewState.Data -> {
-                showData(viewState.pages)
+                showData(viewState.pages, viewState.hasContinue)
             }
             is MainViewState.Error -> {
                 showError(viewState.errorMessage)
@@ -122,22 +124,21 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    private fun showData(pages: List<UiPage>) {
-        if (currentPage != PAGE_START) {
+    private fun showData(pages: List<UiPage>, hasContinue: Boolean) {
+        if (loadingCounter != FIRST_LOADING) {
             pagesAdapter.removeLoadingItem()
         }
         pagesAdapter.addPages(pages)
         swapContainer.isRefreshing = false
-        if (currentPage < totalPage) {
+        if (hasContinue) {
             pagesAdapter.addLoadingItem()
-        } else {
-            isLastPage = true
         }
+        isLastPage = !hasContinue
         isLoading = false
     }
 
     private fun showLoading() {
-        if (currentPage == PAGE_START) {
+        if (loadingCounter == FIRST_LOADING) {
             swapContainer.isRefreshing = true
         }
     }
@@ -145,12 +146,12 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun checkLocationPermission() {
         if ((ContextCompat.checkSelfPermission(
                 this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED)
         ) {
             ActivityCompat.requestPermissions(
                 this, arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_FINE_LOCATION
                 ), LOCATION_PERMISSION_CODE
             )
         } else {
@@ -162,12 +163,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun getLastLocation() {
         fusedLocationProviderClient.lastLocation
             .addOnSuccessListener { location: Location? ->
-                //                if (location != null) {
-//                    mainViewModel.loadPages(UserLocation(location.latitude, location.longitude))
-//                } else {
-//                    mainViewModel.loadPages(null)
-//                }
-                userLocation = UserLocation(53.9, 27.56)
+                userLocation = if (location != null) {
+                    UserLocation(
+                        location.latitude,
+                        location.longitude
+                    )
+                } else {
+                    null
+                }
                 mainViewModel.loadPages(userLocation)
                 return@addOnSuccessListener
             }

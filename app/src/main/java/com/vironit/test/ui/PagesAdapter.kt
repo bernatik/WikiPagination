@@ -3,7 +3,6 @@ package com.vironit.test.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vironit.test.R
@@ -40,7 +39,7 @@ class PagesAdapter : RecyclerView.Adapter<PagesAdapter.ViewHolder>() {
         }
     }
 
-    fun clear(){
+    fun clear() {
         pages.clear()
     }
 

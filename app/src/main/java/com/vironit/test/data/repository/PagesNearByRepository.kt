@@ -8,18 +8,18 @@ object PagesNearByRepository : IPagesNearByRepository {
 
     private var continueString: String? = null
 
-    override suspend fun getPagesNearBy(lat: Double, lon: Double): List<UiPage> {
+    override suspend fun getPagesNearBy(lat: Double, lon: Double): Pair<List<UiPage>, Boolean> {
         val resultData = mutableListOf<UiPage>()
         val pagesData = ApiFactory.wikiApi.getPagesNearByAsync(
             "$lat|$lon",
             continueString
         ).await()
-        continueString = pagesData.continueData?.continueLoadingFrom?.substringBefore("|")
+        continueString = pagesData.continueData?.continueLoadingFrom
         for (page in pagesData.query.pagesList.values) {
             val imagesCount = getImagesCountForPage(page.title)
             resultData.add(UiPage(page.title, imagesCount))
         }
-        return resultData
+        return Pair(resultData, continueString != null)
     }
 
     override suspend fun getImagesCountForPage(pageTitle: String): Int {

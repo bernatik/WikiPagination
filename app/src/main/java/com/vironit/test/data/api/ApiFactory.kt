@@ -19,17 +19,10 @@ object ApiFactory{
 
     private const val ACTION_QUERY_PARAM = "action"
     private const val FORMAT_QUERY_PARAM = "format"
-    private const val PROP_QUERY_PARAM = "prop"
-    private const val RADIUS_QUERY_PARAM = "ggsradius"
-    private const val GENERATOR_QUERY_PARAM = "generator"
     private const val PAGES_LIMIT_QUERY_PARAM = "ggslimit"
-    private const val IMAGES_LIMIT_QUERY_PARAM = "imlimit"
 
     private const val ACTION_QUERY_VALUE = "query"
     private const val FORMAT_QUERY_VALUE = "json"
-    private const val GENERATOR_QUERY_VALUE = "geosearch"
-    private const val PROP_QUERY_VALUE = "images"
-    private const val RADIUS_QUERY_VALUE = "1000"
 
     private val wikiApiClient = OkHttpClient().newBuilder()
         .addInterceptor(HttpLoggingInterceptor().apply {
@@ -39,11 +32,7 @@ object ApiFactory{
             val url = chain.request().url().newBuilder()
                 .addQueryParameter(ACTION_QUERY_PARAM, ACTION_QUERY_VALUE)
                 .addQueryParameter(FORMAT_QUERY_PARAM, FORMAT_QUERY_VALUE)
-//                .addQueryParameter(GENERATOR_QUERY_PARAM, GENERATOR_QUERY_VALUE)
-                .addQueryParameter(PROP_QUERY_PARAM, PROP_QUERY_VALUE)
-//                .addQueryParameter(RADIUS_QUERY_PARAM, RADIUS_QUERY_VALUE)
                 .addQueryParameter(PAGES_LIMIT_QUERY_PARAM, PAGE_LIMIT_SIZE.toString())
-//                .addQueryParameter(IMAGES_LIMIT_QUERY_PARAM, IMAGES_LIMIT_QUERY_VALUE)
                 .build()
             chain.proceed(chain.request().newBuilder().url(url).build())
         }

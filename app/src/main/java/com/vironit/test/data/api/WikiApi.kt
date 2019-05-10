@@ -13,7 +13,7 @@ interface WikiApi {
         @Query(value = ApiFactory.CONTINUE_QUERY_PARAM) imcontinue: String?
     ): Deferred<PagesData>
 
-    @GET("api.php")
+    @GET("api.php?prop=images")
     fun getImagesDataForPageAsync(
         @Query(value = ApiFactory.PAGE_TITLE_QUERY_PARAM) title: String,
         @Query(value = ApiFactory.CONTINUE_QUERY_PARAM) imcontinue: String?

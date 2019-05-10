@@ -17,14 +17,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         get() = _viewState
 
     fun loadPages(userLocation: Location?) {
-        viewModelScope.launch {
-            if (userLocation == null) {
-                _viewState.postValue(MainViewState.Error("Location is undefined"))
-            } else {
+        if (userLocation == null) {
+            _viewState.value = MainViewState.Error("Location is undefined")
+        } else {
+            viewModelScope.launch {
                 try {
                     withContext(Dispatchers.IO) {
-                        val data = PagesNearByRepository.getPagesNearBy(userLocation.latitude, userLocation.longitude)
-                        _viewState.postValue(MainViewState.Data(data))
+                        val (data, hasContinue) = PagesNearByRepository.getPagesNearBy(
+                            userLocation.latitude,
+                            userLocation.longitude
+                        )
+                        _viewState.postValue(MainViewState.Data(data, hasContinue))
                     }
                 } catch (e: Exception) {
                     _viewState.postValue(MainViewState.Error("Error with networking"))
