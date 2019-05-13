@@ -127,8 +127,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private fun showData(pages: List<UiPage>, hasContinue: Boolean) {
         if (loadingCounter != FIRST_LOADING) {
             pagesAdapter.removeLoadingItem()
+            pagesAdapter.addPages(pages)
+        } else {
+            pagesAdapter.insertPages(pages)
         }
-        pagesAdapter.addPages(pages)
         swapContainer.isRefreshing = false
         if (hasContinue) {
             pagesAdapter.addLoadingItem()

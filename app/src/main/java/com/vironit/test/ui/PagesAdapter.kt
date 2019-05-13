@@ -24,6 +24,11 @@ class PagesAdapter : RecyclerView.Adapter<PagesAdapter.ViewHolder>() {
         notifyItemInserted(pages.size - 1)
     }
 
+    fun insertPages(newPages: List<UiPage>) {
+        pages.addAll(newPages)
+        notifyDataSetChanged()
+    }
+
     fun addLoadingItem() {
         isLoading = true
         pages.add(UiPage("", 0))
