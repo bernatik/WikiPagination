@@ -1,5 +1,6 @@
 package com.vironit.test.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +32,7 @@ class PagesAdapter : RecyclerView.Adapter<PagesAdapter.ViewHolder>() {
 
     fun addLoadingItem() {
         isLoading = true
-        pages.add(UiPage("", 0))
+        pages.add(UiPage("", listOf()))
     }
 
     fun removeLoadingItem() {
@@ -90,10 +91,13 @@ class PagesAdapter : RecyclerView.Adapter<PagesAdapter.ViewHolder>() {
             is ViewHolder.Page -> {
                 val page = pages[holder.adapterPosition]
                 holder.pageTitle.text = page.title
+                holder.pageTitle.setOnClickListener {
+                    Log.i("page", page.images.toString())
+                }
                 holder.imageNumber.text = holder.imageNumber.context.resources.getQuantityString(
                     R.plurals.image_plurals,
-                    page.imagesCount,
-                    page.imagesCount
+                    page.images.size,
+                    page.images.size
                 )
             }
             is ViewHolder.Loading -> {
