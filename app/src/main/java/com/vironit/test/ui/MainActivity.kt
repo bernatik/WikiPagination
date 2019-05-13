@@ -18,7 +18,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import com.vironit.test.R
 import com.vironit.test.data.model.UiPage
-import com.vironit.test.ui.Location as UserLocation
+import com.vironit.test.data.model.Location as UserLocation
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
